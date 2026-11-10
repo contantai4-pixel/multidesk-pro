@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="MultiDesk PRO profile organizer">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>MultiDesk PRO</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#141f32;--panel2:#1d2b43;--text:#f4f7fc;--muted:#9eacc2;--blue:#2785ff;--line:#2b3b55;--red:#a83c50}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -5%,#1c3b66 0,transparent 34%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{max-width:980px;margin:auto;padding:20px 16px 44px}.top{display:flex;align-items:center;gap:12px;margin-bottom:22px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#1685ff,#6257e8);display:grid;place-items:center;font-size:24px;font-weight:900}.brand{font-size:22px;font-weight:850}.sub{font-size:11px;color:var(--muted);letter-spacing:1.1px}.version{margin-left:auto;border:1px solid #315b8e;color:#9bcaff;border-radius:30px;padding:6px 10px;font-size:11px}.hero,.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:18px}.hero{padding:22px;background:linear-gradient(130deg,#1a3151,#141f32);margin-bottom:14px}.hero h1{margin:0 0 8px;font-size:26px}.hero p{margin:0;color:var(--muted);line-height:1.55}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}.stat{padding:14px}.stat b{font-size:22px;display:block}.stat span{font-size:12px;color:var(--muted)}.panel{padding:16px;margin:14px 0}.panel h2{font-size:16px;margin:0 0 13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}input{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:#0d1728;color:var(--text);font:inherit;outline:none}input:focus{border-color:var(--blue)}button{border:0;border-radius:11px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;font-size:13px;cursor:pointer}button.secondary{background:var(--panel2);border:1px solid var(--line)}button.danger{background:#512631;color:#ffc0c7;border:1px solid #713642}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{flex:1;min-width:160px}.list{display:grid;gap:9px}.account{background:#101a2b;border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;align-items:center;gap:11px}.avatar{width:40px;height:40px;border-radius:13px;background:#243e62;display:grid;place-items:center;font-weight:800;color:#9ecbff;flex-shrink:0}.ainfo{flex:1;min-width:0}.ainfo strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ainfo small{color:var(--muted)}.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.actions button{padding:9px 10px}.empty{color:var(--muted);text-align:center;padding:22px;border:1px dashed var(--line);border-radius:13px}.notice{font-size:12px;color:#c5d0e0;line-height:1.6;background:#19263a;border-left:3px solid #e6ad4d;padding:12px;border-radius:8px}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:22px}.hidden{display:none!important}
+@media(min-width:650px){.stats{grid-template-columns:repeat(4,1fr)}.hero h1{font-size:30px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="top"><div class="logo">M</div><div><div class="brand">MultiDesk PRO</div><div class="sub">ACCOUNT PROFILE ORGANIZER</div></div><div class="version">V1.1</div></header>
+<section class="hero"><h1>All your profiles, in one place.</h1><p>Organize profile labels, choose a profile, and open Facebook's official website when you need it.</p></section>
+<section class="stats">
+<div class="stat"><b id="total">0</b><span>Saved profiles</span></div>
+<div class="stat"><b id="selected">—</b><span>Selected profile</span></div>
+<div class="stat"><b>Local</b><span>Browser storage</span></div>
+<div class="stat"><b>Web</b><span>Login method</span></div>
+</section>
+<section class="panel">
+<h2>Add profile</h2>
+<div class="grid">
+<div class="field"><label for="profileName">Profile label</label><input id="profileName" maxlength="45" placeholder="Personal / Work / Page admin"></div>
+<div class="field"><label for="profileNote">Optional note</label><input id="profileNote" maxlength="80" placeholder="No passwords or login codes"></div>
+</div>
+<p><button id="add">＋ Add profile</button></p>
+</section>
+<section class="panel">
+<h2>Your profiles</h2>
+<div class="toolbar"><input id="search" placeholder="Search profiles…"><button class="secondary" id="export">Export backup</button><button class="secondary" id="import">Import backup</button><input class="hidden" id="file" type="file" accept="application/json"></div>
+<div id="list" class="list"></div>
+</section>
+<section class="panel">
+<h2>Privacy & session information</h2>
+<div class="notice"><b>Credential safety:</b> Never enter Facebook passwords, 2FA codes, or session cookies into MultiDesk. Sign in only on Facebook's official website. MultiDesk stores profile labels and notes locally in this browser. This release does not create isolated Facebook sessions: profiles opened in the same browser may share its login state. Do not use this app on a shared or untrusted device.</div>
+</section>
+<div class="footer">MultiDesk PRO is an independent profile organizer and is not affiliated with Meta or Facebook.</div>
+</main>
+<script>
+const KEY='multidesk-pro-v11';let profiles=[],selected=null;
+try{profiles=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(profiles))profiles=[];}catch(e){profiles=[]}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){localStorage.setItem(KEY,JSON.stringify(profiles));render()}
+function add(){let name=$('profileName').value.trim(),note=$('profileNote').value.trim();if(!name){alert('Please enter a profile label.');return}profiles.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),name,note});$('profileName').value='';$('profileNote').value='';save()}
+function del(id){if(!confirm('Delete this profile from MultiDesk?'))return;profiles=profiles.filter(p=>p.id!==id);if(selected===id)selected=null;save()}
+function render(){let shown=profiles.filter(p=>(p.name+' '+(p.note||'')).toLowerCase().includes($('search').value.toLowerCase()));$('total').textContent=profiles.length;let p=profiles.find(x=>x.id===selected);$('selected').textContent=p?p.name:'—';$('list').innerHTML=shown.length?shown.map(p=>`<article class="account"><div class="avatar">${esc(p.name.charAt(0).toUpperCase())}</div><div class="ainfo"><strong>${esc(p.name)}</strong><small>${esc(p.note||'No note')}${p.id===selected?' • Selected':''}</small></div><div class="actions"><button class="secondary" data-act="select" data-id="${esc(p.id)}">Select</button><button data-act="open" data-id="${esc(p.id)}">Open</button><button class="danger" data-act="delete" data-id="${esc(p.id)}">Delete</button></div></article>`).join(''):'<div class="empty">No matching profiles. Add a profile to get started.</div>'}
+$('add').onclick=add;$('search').oninput=render;
+$('list').onclick=e=>{let b=e.target.closest('button[data-act]');if(!b)return;let id=b.dataset.id;if(b.dataset.act==='select'){selected=id;render()}if(b.dataset.act==='delete')del(id);if(b.dataset.act==='open'){selected=id;render();window.open('https://www.facebook.com/','_blank','noopener,noreferrer')}};
+$('export').onclick=()=>{let blob=new Blob([JSON.stringify({app:'MultiDesk PRO',version:1,profiles},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='multidesk-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('import').onclick=()=>$('file').click();
+$('file').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let d=JSON.parse(await f.text());if(!Array.isArray(d.profiles))throw 0;let clean=d.profiles.filter(p=>p&&typeof p.name==='string').map(p=>({id:String(p.id||Date.now()+Math.random()),name:p.name.slice(0,45),note:String(p.note||'').slice(0,80)}));if(confirm(`Add ${clean.length} profiles? Existing profiles will remain.`)){profiles.push(...clean);save()}}catch(_){alert('Invalid backup file')}e.target.value=''};
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+render();
+</script>
+</body></html>
